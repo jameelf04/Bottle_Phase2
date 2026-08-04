@@ -1,9 +1,5 @@
 let currentBottleId = null;
 
-axios.get(BASE_URL + "condition.php")
-    .then( res => document.getElementById("oceanCondition").textContent = "Today's ocean: " + res.data.condition)
-    .catch( err => console.log("Failed to load condition: " + err.message));
-
 function initUser(){
     const savedToken = localStorage.getItem("token") || "";
 
@@ -17,6 +13,10 @@ function initUser(){
 
 initUser();
 
+axios.get(BASE_URL + "condition.php")
+    .then( res => document.getElementById("oceanCondition").textContent = "Today's ocean: " + res.data.condition)
+    .catch( err => console.log("Failed to load condition: " + err.message));
+
 function throwBottle(){
     const messageText = document.getElementById("throwText").value;
     const token = localStorage.getItem("token");
@@ -28,10 +28,14 @@ function throwBottle(){
 
 function drawBottle(){
     const token = localStorage.getItem("token");
+    const resultEl = document.getElementById("drawResult");
+
+    resultEl.style.opacity = 0;
 
     axios.get(BASE_URL + "draw.php", { params: { token: token } })
         .then( res => {
-            document.getElementById("drawResult").textContent = res.data.message;
+            resultEl.textContent = res.data.message;
+            setTimeout(() => { resultEl.style.opacity = 1; }, 50);
             if(res.data.success){
                 currentBottleId = res.data.bottleid;
             }
