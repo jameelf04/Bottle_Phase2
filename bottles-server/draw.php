@@ -1,5 +1,6 @@
 <?php
 include(__DIR__ . "/database/connection.php");
+include(__DIR__ . "/drift.php");
 
 $token = $_GET["token"];
 
@@ -94,13 +95,20 @@ if (count($candidates) == 0) {
     exit();
 }
 
+$userX = $user["origin_x"];
+$userY = $user["origin_y"];
+
 $totalWeight = 0;
 foreach ($candidates as &$c){
     $rarityScore = 1 / (1 + $c["holdcount"]);
     $neglectScore = min($c["age_seconds"] / 86400, 30);
     $markScore = $c["markcount"] * 2;
 
-    $c["score"] = 1 + $rarityScore + $neglectScore + $markScore;
+    $position = getBottlePosition($c["origin_x"], $c["origin_y"], $c["seed"], $c["age_seconds"]);
+    $distance = sqrt(pow($position["x"] - $userX, 2) + pow($position["y"] - $userY, 2));
+    $proximityScore = max(0, 10 - ($distance / 10));
+
+    $c["score"] = 1 + $rarityScore + $neglectScore + $markScore + $proximityScore;
     $totalWeight += $c["score"];
 }
 unset($c);
