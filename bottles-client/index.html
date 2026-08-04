@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kalam&display=swap" rel="stylesheet">
+  <title>Bottle</title>
+</head>
+<body>
+<h1>Bottle Phase 1</h1>
+<nav>
+  <a href="pages/mybottles.html">My Bottles</a>
+  <a href="pages/admin.html">Admin</a>
+</nav>
+  <div class="card"> 
+    <p>throw here!</p> 
+    <textarea id="throwText"></textarea>
+    <button onclick="throwBottle()">Throw</button>
+    <p id="throwStatus"></p>
+  </div>
+
+  <div class="card">
+    <button onclick="drawBottle()">Draw Here!</button>
+    <p id="drawResult"></p>
+    <p>add a comment!</p>
+    <textarea id="markText"></textarea>
+    <button onclick="markBottle()">add comment</button>
+    <p id="markStatus"></p>
+    <button onclick="reportBottle()">Report</button>
+    <p id="reportStatus"></p>
+  </div>
+
+<script src="scripts/axios.min.js"></script>
+<script src="scripts/env.js"></script>
+<script src="scripts/pages/index.js"></script>
+</body>
+</html>
