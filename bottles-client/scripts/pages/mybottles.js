@@ -1,8 +1,10 @@
-const token = localStorage.getItem("token");
-
-axios.get(BASE_URL + "mybottles.php", { params: { token: token } })
+axios.get(BASE_URL + "mybottles.php", { params: { token: localStorage.getItem("token") } })
     .then( res => renderBottles(res.data.data))
     .catch( err => console.log("Failed to load bottles: " + err.message));
+
+axios.get(BASE_URL + "keeps.php", { params: { token: localStorage.getItem("token") } })
+    .then( res => renderShelf(res.data.data))
+    .catch( err => console.log("Failed to load shelf: " + err.message));
 
 function renderBottles(bottles){
     const container = document.getElementById("bottlesContainer");
@@ -21,12 +23,6 @@ function renderBottles(bottles){
         container.innerHTML += html;
     }
 }
-
-const shelfToken = localStorage.getItem("token");
-
-axios.get(BASE_URL + "keeps.php", { params: { token: shelfToken } })
-    .then( res => renderShelf(res.data.data))
-    .catch( err => console.log("Failed to load shelf: " + err.message));
 
 function renderShelf(bottles){
     const container = document.getElementById("shelfContainer");
