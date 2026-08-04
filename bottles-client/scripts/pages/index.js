@@ -1,5 +1,9 @@
 let currentBottleId = null;
 
+axios.get(BASE_URL + "condition.php")
+    .then( res => document.getElementById("oceanCondition").textContent = "Today's ocean: " + res.data.condition)
+    .catch( err => console.log("Failed to load condition: " + err.message));
+
 function initUser(){
     const savedToken = localStorage.getItem("token") || "";
 
