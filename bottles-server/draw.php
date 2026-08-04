@@ -1,7 +1,5 @@
 <?php
 include(__DIR__ . "/database/connection.php");
-include(__DIR__ . "/drift.php");
-
 $token = $_GET["token"];
 
 $sql = "SELECT * FROM users WHERE token = ?";
