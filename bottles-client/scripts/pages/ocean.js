@@ -1,25 +1,128 @@
-function drawOcean(){
-    axios.get(BASE_URL + "ocean_positions.php")
-        .then( res => renderOcean(res.data.data))
-        .catch( err => console.log("Failed to load ocean: " + err.message));
+const canvas = document.getElementById("oceanCanvas");
+const ctx = canvas.getContext("2d");
+
+let bottles = [];
+let bubbles = [];
+
+for (let i = 0; i < 40; i++) {
+    bubbles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: 1 + Math.random() * 2.5,
+        speed: 0.2 + Math.random() * 0.6,
+        drift: Math.random() * 0.6 - 0.3
+    });
 }
 
-function renderOcean(bottles){
-    const canvas = document.getElementById("oceanCanvas");
-    const ctx = canvas.getContext("2d");
+function fetchPositions() {
+    axios.get(BASE_URL + "ocean_positions.php")
+        .then(res => { bottles = res.data.data; })
+        .catch(err => console.log("Failed to load ocean: " + err.message));
+}
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+fetchPositions();
+setInterval(fetchPositions, 5000);
 
-    for(let i = 0; i < bottles.length; i++){
-        const pixelX = (bottles[i].x / 100) * canvas.width;
-        const pixelY = (bottles[i].y / 100) * canvas.height;
+function drawBackground(time) {
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, "#0d2a3a");
+    grad.addColorStop(0.5, "#082033");
+    grad.addColorStop(1, "#020a12");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.globalAlpha = 0.06;
+    for (let i = 0; i < 4; i++) {
+        const rayX = ((time / 4000) * canvas.width + i * 220) % (canvas.width + 200) - 100;
+        const grad2 = ctx.createLinearGradient(rayX, 0, rayX + 80, canvas.height);
+        grad2.addColorStop(0, "rgba(255,255,255,0)");
+        grad2.addColorStop(0.5, "rgba(255,255,255,0.8)");
+        grad2.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = grad2;
+        ctx.beginPath();
+        ctx.moveTo(rayX, 0);
+        ctx.lineTo(rayX + 60, 0);
+        ctx.lineTo(rayX - 40, canvas.height);
+        ctx.lineTo(rayX - 100, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+    }
+    ctx.restore();
+}
+
+function drawWaveLine(time) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(45, 212, 191, 0.25)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let x = 0; x <= canvas.width; x += 8) {
+        const y = 30 + Math.sin((x / 60) + time / 900) * 8;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawBubbles(dt) {
+    ctx.save();
+    for (const b of bubbles) {
+        b.y -= b.speed * dt * 0.06;
+        b.x += b.drift * dt * 0.02;
+
+        if (b.y < -10) {
+            b.y = canvas.height + 10;
+            b.x = Math.random() * canvas.width;
+        }
 
         ctx.beginPath();
-        ctx.arc(pixelX, pixelY, 4, 0, 2 * Math.PI);
-        ctx.fillStyle = "#c9a24b";
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,255,255,0.35)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function drawBottles(time) {
+    for (let i = 0; i < bottles.length; i++) {
+        const b = bottles[i];
+        const pixelX = (b.x / 100) * canvas.width;
+        const bob = Math.sin(time / 700 + b.bottleid) * 4;
+        const pixelY = (b.y / 100) * canvas.height + bob;
+
+        const glow = ctx.createRadialGradient(pixelX, pixelY, 0, pixelX, pixelY, 16);
+        glow.addColorStop(0, "rgba(245, 169, 98, 0.55)");
+        glow.addColorStop(1, "rgba(245, 169, 98, 0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(pixelX, pixelY, 16, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(pixelX, pixelY, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#f5d29a";
+        ctx.shadowColor = "#f5a962";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
     }
 }
 
-drawOcean();
-setInterval(drawOcean, 2000);
+let lastTime = performance.now();
+
+function animate(time) {
+    const dt = time - lastTime;
+    lastTime = time;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground(time);
+    drawWaveLine(time);
+    drawBubbles(dt);
+    drawBottles(time);
+
+    requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
