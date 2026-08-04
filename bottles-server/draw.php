@@ -18,7 +18,10 @@ $query->execute();
 $array = $query->get_result();
 $row = $array->fetch_assoc();
 
-$dailyDrawLimit = 5;
+include(__DIR__ . "/drift.php");
+$condition = getOceanCondition();
+$dailyDrawLimit = 5 + getConditionLimitModifier($condition);
+
 
 if ($row["total"] >= $dailyDrawLimit) {
     $response = [];
