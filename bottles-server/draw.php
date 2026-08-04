@@ -43,23 +43,52 @@ if ($throwCount == 0) {
     exit();
 }
 
-$sql = "SELECT * FROM bottles 
-        WHERE userid != ? 
-        AND bottleid NOT IN (SELECT bottleid FROM draws WHERE userid = ?)
-        ORDER BY RAND() 
-        LIMIT 1";
+$sql = "SELECT b.*, 
+        (SELECT COUNT(*) FROM draws d WHERE d.bottleid = b.bottleid) AS holdcount,
+        (SELECT COUNT(*) FROM marks m WHERE m.bottleid = b.bottleid) AS markcount,
+        TIMESTAMPDIFF(SECOND, b.time, NOW()) AS age_seconds
+        FROM bottles b
+        WHERE b.userid != ? 
+        AND b.bottleid NOT IN (SELECT bottleid FROM draws WHERE userid = ?)";
 $query = $mysql->prepare($sql);
 $query->bind_param("ii", $user["userid"], $user["userid"]);
 $query->execute();
 $array = $query->get_result();
-$bottle = $array->fetch_assoc();
 
-if ($bottle == null) {
+$candidates = [];
+while ($row = $array->fetch_assoc()){
+    $candidates[] = $row;
+}
+
+if (count($candidates) == 0) {
     $response = [];
     $response["success"] = false;
     $response["message"] = "No bottles available to draw right now!";
     echo json_encode($response);
     exit();
+}
+
+$totalWeight = 0;
+foreach ($candidates as &$c){
+    $rarityScore = 1 / (1 + $c["holdcount"]);
+    $neglectScore = min($c["age_seconds"] / 86400, 30);
+    $markScore = $c["markcount"] * 2;
+
+    $c["score"] = 1 + $rarityScore + $neglectScore + $markScore;
+    $totalWeight += $c["score"];
+}
+unset($c);
+
+$randomPoint = mt_rand() / mt_getrandmax() * $totalWeight;
+$runningTotal = 0;
+$bottle = null;
+
+foreach ($candidates as $c){
+    $runningTotal += $c["score"];
+    if ($randomPoint <= $runningTotal){
+        $bottle = $c;
+        break;
+    }
 }
 
 $sql = "INSERT INTO draws(userid, bottleid) VALUES(?, ?)";
