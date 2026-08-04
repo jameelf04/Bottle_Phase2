@@ -24,9 +24,12 @@ if (isset($_GET["token"]) && $_GET["token"] !== "") {
     $nouns = ["lantern", "signal", "harbor", "current", "tide"];
     $displayName = $adjectives[array_rand($adjectives)] . "-" . $nouns[array_rand($nouns)] . "-" . rand(1, 999);
 
-    $sql = "INSERT INTO users(token, display_name) VALUES(?, ?)";
+    $originX = rand(0, 1000) / 10;
+    $originY = rand(0, 1000) / 10;
+
+    $sql = "INSERT INTO users(token, display_name, origin_x, origin_y) VALUES(?, ?, ?, ?)";
     $query = $mysql->prepare($sql);
-    $query->bind_param("ss", $token, $displayName);
+    $query->bind_param("ssdd", $token, $displayName, $originX, $originY);
     $query->execute();
 
     $response = [];
