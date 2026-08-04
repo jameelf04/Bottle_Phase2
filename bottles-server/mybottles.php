@@ -10,7 +10,7 @@ $query->execute();
 $array = $query->get_result();
 $user = $array->fetch_assoc();
 
-$sql = "SELECT * FROM bottles WHERE userid = ?";
+$sql = "SELECT *, TIMESTAMPDIFF(SECOND, time, NOW()) AS age_seconds FROM bottles WHERE userid = ?";
 $query = $mysql->prepare($sql);
 $query->bind_param("i", $user["userid"]);
 $query->execute();
@@ -23,6 +23,7 @@ $response["data"] = [];
 while ($bottle = $array->fetch_assoc()) {
     $bottleData = [];
     $bottleData["message"] = $bottle["message"];
+    $bottleData["age_seconds"] = $bottle["age_seconds"];
 
     $sql2 = "SELECT COUNT(*) AS total FROM draws WHERE bottleid = ?";
     $query2 = $mysql->prepare($sql2);
@@ -46,5 +47,4 @@ while ($bottle = $array->fetch_assoc()) {
 }
 
 echo json_encode($response);
-
 ?>
