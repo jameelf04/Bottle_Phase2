@@ -41,6 +41,11 @@ $query = $mysql->prepare($sql);
 $query->bind_param("iis", $bottleid, $user["userid"], $content);
 $query->execute();
 
+$sql = "UPDATE bottles SET last_activity = NOW() WHERE bottleid = ?";
+$query = $mysql->prepare($sql);
+$query->bind_param("i", $bottleid);
+$query->execute();
+
 $response = [];
 $response["success"] = true;
 $response["message"] = "Mark added!";
