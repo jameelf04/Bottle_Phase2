@@ -45,9 +45,13 @@ if ($row["total"] >= $dailyThrowLimit) {
     exit();
 }
 
-$sql = "INSERT INTO bottles(userid, message) VALUES(?, ?)";
+$originX = rand(0, 1000) / 10;
+$originY = rand(0, 1000) / 10;
+$seed = rand(1, 999999);
+
+$sql = "INSERT INTO bottles(userid, message, origin_x, origin_y, seed) VALUES(?, ?, ?, ?, ?)";
 $query = $mysql->prepare($sql);
-$query->bind_param("is", $user["userid"], $message);
+$query->bind_param("isddi", $user["userid"], $message, $originX, $originY, $seed);
 $query->execute();
 
 $response = [];
