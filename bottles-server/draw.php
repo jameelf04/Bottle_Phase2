@@ -43,12 +43,38 @@ if ($throwCount == 0) {
     exit();
 }
 
+$expiryDays = 14;
+$archiveMarkThreshold = 7;
+
+$sql = "SELECT bottleid, 
+        (SELECT COUNT(*) FROM marks m WHERE m.bottleid = bottles.bottleid) AS markcount,
+        TIMESTAMPDIFF(DAY, last_activity, NOW()) AS days_inactive
+        FROM bottles WHERE status = 'active'";
+$query = $mysql->prepare($sql);
+$query->execute();
+$array = $query->get_result();
+
+while ($b = $array->fetch_assoc()){
+    if ($b["markcount"] >= $archiveMarkThreshold){
+        $sql2 = "UPDATE bottles SET status = 'archived' WHERE bottleid = ?";
+        $query2 = $mysql->prepare($sql2);
+        $query2->bind_param("i", $b["bottleid"]);
+        $query2->execute();
+    } elseif ($b["days_inactive"] >= $expiryDays){
+        $sql2 = "UPDATE bottles SET status = 'expired' WHERE bottleid = ?";
+        $query2 = $mysql->prepare($sql2);
+        $query2->bind_param("i", $b["bottleid"]);
+        $query2->execute();
+    }
+}
+
 $sql = "SELECT b.*, 
         (SELECT COUNT(*) FROM draws d WHERE d.bottleid = b.bottleid) AS holdcount,
         (SELECT COUNT(*) FROM marks m WHERE m.bottleid = b.bottleid) AS markcount,
         TIMESTAMPDIFF(SECOND, b.time, NOW()) AS age_seconds
         FROM bottles b
         WHERE b.userid != ? 
+        AND b.status = 'active'
         AND b.bottleid NOT IN (SELECT bottleid FROM draws WHERE userid = ?)";
 $query = $mysql->prepare($sql);
 $query->bind_param("ii", $user["userid"], $user["userid"]);
