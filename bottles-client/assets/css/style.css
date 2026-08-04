@@ -1,59 +1,194 @@
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-bg-strong: rgba(255, 255, 255, 0.14);
+  --accent: #2dd4bf;
+  --accent-warm: #f5a962;
+  --text-main: #eaf6f6;
+  --text-dim: #a9c2c2;
+  --shadow-glow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background-image: url('../images/nemo.jpg');
-  background-size: cover;
-  color: #1a3c40;
+  margin: 0;
+  min-height: 100vh;
   font-family: 'Kalam', cursive;
+  color: var(--text-main);
+  background-image:
+    linear-gradient(180deg, rgba(4, 12, 20, 0.88) 0%, rgba(4, 16, 24, 0.72) 40%, rgba(2, 10, 16, 0.92) 100%),
+    url('../images/nemo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   text-align: center;
+  padding-bottom: 60px;
 }
 
 h1 {
-  color: #ff6f3c;
+  font-family: 'Kalam', cursive;
+  font-weight: 700;
+  font-size: 2.6rem;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 40px 0 8px;
+  margin: 0;
+}
+
+nav {
+  display: inline-flex;
+  gap: 6px;
+  margin: 18px auto 30px;
+  padding: 8px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 999px;
+  box-shadow: var(--shadow-glow);
 }
 
 nav a {
-  color: #ff6f3c;
+  font-family: 'Kalam', cursive;
+  color: var(--text-main);
   text-decoration: none;
-  margin: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 8px 18px;
+  border-radius: 999px;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+nav a:hover {
+  background: var(--accent);
+  color: #062018;
 }
 
 .card {
-  background-color: #ffffff;
-  border: 2px solid #ff6f3c;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 20px auto;
-  width: 300px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 20px;
+  padding: 28px 30px;
+  margin: 22px auto;
+  max-width: 380px;
+  box-shadow: var(--shadow-glow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-textarea {
-  width: 90%;
-  padding: 5px;
-}
-
-input {
-  padding: 5px;
-}
-
-button {
-  background-color: #ff6f3c;
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 16px;
-  margin: 10px;
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
 }
 
 p {
+  font-family: 'Kalam', cursive;
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  line-height: 1.5;
   margin: 8px 0;
 }
 
+.card p:first-of-type {
+  color: var(--text-main);
+  font-size: 1.15rem;
+}
+
+textarea, input[type="password"], input[type="text"] {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text-main);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px;
+  font-family: 'Kalam', cursive;
+  font-size: 1.05rem;
+  resize: vertical;
+  margin-bottom: 10px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+textarea:focus, input:focus {
+  border-color: var(--accent);
+}
+
+button {
+  background: linear-gradient(135deg, var(--accent), #1ba394);
+  color: #052018;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-family: 'Kalam', cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  margin: 6px;
+  box-shadow: 0 4px 14px rgba(45, 212, 191, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(45, 212, 191, 0.5);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
 #oceanCondition {
-  background-color: rgba(255, 255, 255, 0.7);
+  font-family: 'Kalam', cursive;
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 10px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  color: var(--accent-warm);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 6px;
 }
 
 #drawResult {
   transition: opacity 0.5s ease;
+  font-family: 'Kalam', cursive;
+  font-size: 1.15rem;
+  color: var(--text-main);
+}
+
+canvas {
+  border-radius: 16px !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--shadow-glow);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+
+#oceanCanvas {
+  display: block;
+  width: 600px;
+  height: 600px;
+  margin: 20px auto 40px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glow);
 }
