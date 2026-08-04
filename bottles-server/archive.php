@@ -2,6 +2,7 @@
 include(__DIR__ . "/database/connection.php");
 
 $sql = "SELECT b.bottleid, b.message, b.time,
+        TIMESTAMPDIFF(SECOND, b.time, NOW()) AS age_seconds,
         (SELECT COUNT(*) FROM marks m WHERE m.bottleid = b.bottleid) AS markcount
         FROM bottles b
         WHERE b.status = 'archived'
@@ -19,6 +20,7 @@ while ($bottle = $array->fetch_assoc()){
     $bottleData["bottleid"] = $bottle["bottleid"];
     $bottleData["message"] = $bottle["message"];
     $bottleData["markcount"] = $bottle["markcount"];
+    $bottleData["age_seconds"] = $bottle["age_seconds"];
 
     $sql2 = "SELECT content FROM marks WHERE bottleid = ? ORDER BY time ASC";
     $query2 = $mysql->prepare($sql2);
