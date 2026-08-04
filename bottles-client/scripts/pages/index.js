@@ -61,3 +61,16 @@ function reportBottle(){
         .then( res => document.getElementById("reportStatus").textContent = res.data.message)
         .catch( err => console.log("Failed to report: " + err.message));
 }
+
+function keepBottle(){
+    const token = localStorage.getItem("token");
+
+    if(currentBottleId === null){
+        document.getElementById("keepStatus").textContent = "Draw a bottle first!";
+        return;
+    }
+
+    axios.post(BASE_URL + "keep.php", new URLSearchParams({ bottleid: currentBottleId, token: token }))
+        .then( res => document.getElementById("keepStatus").textContent = res.data.message)
+        .catch( err => console.log("Failed to keep: " + err.message));
+}
