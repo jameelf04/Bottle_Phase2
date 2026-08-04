@@ -35,7 +35,9 @@ $query->execute();
 $array = $query->get_result();
 $row = $array->fetch_assoc();
 
-$dailyThrowLimit = 5;
+include(__DIR__ . "/drift.php");
+$condition = getOceanCondition();
+$dailyThrowLimit = 5 + getConditionLimitModifier($condition);
 
 if ($row["total"] >= $dailyThrowLimit) {
     $response = [];
