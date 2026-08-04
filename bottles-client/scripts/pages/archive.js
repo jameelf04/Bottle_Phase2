@@ -12,7 +12,10 @@ function renderArchive(bottles){
     }
 
     for(let i = 0; i < bottles.length; i++){
-        let html = "<div class='card'>";
+        const ageDays = bottles[i].age_seconds / 86400;
+        const opacity = Math.max(0.4, 1 - (ageDays / 60));
+
+        let html = "<div class='card' style='opacity:" + opacity + "'>";
         html += "<p>" + bottles[i].message + "</p>";
         html += "<p>" + bottles[i].markcount + " marks collected</p>";
 
