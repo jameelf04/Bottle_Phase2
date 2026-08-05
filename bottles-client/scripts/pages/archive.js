@@ -1,6 +1,14 @@
+function handleArchiveResult(res){
+    renderArchive(res.data.data);
+}
+
+function handleArchiveError(err){
+    document.getElementById("archiveContainer").textContent = "Failed to load archive: " + err.message;
+}
+
 axios.get(BASE_URL + "archive.php")
-    .then( res => renderArchive(res.data.data))
-    .catch( err => console.log("Failed to load archive: " + err.message));
+    .then(handleArchiveResult)
+    .catch(handleArchiveError);
 
 function renderArchive(bottles){
     const container = document.getElementById("archiveContainer");
