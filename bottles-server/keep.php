@@ -35,6 +35,21 @@ if ($row["total"] > 0) {
     exit();
 }
 
+$sql = "SELECT COUNT(*) AS total FROM bottles WHERE bottleid = ? AND userid = ?";
+$query = $mysql->prepare($sql);
+$query->bind_param("ii", $bottleid, $user["userid"]);
+$query->execute();
+$array = $query->get_result();
+$row = $array->fetch_assoc();
+
+if ($row["total"] == 0) {
+    $response = [];
+    $response["success"] = false;
+    $response["message"] = "You can only keep one of your own bottles!";
+    echo json_encode($response);
+    exit();
+}
+
 $sql = "INSERT INTO keeps(userid, bottleid) VALUES(?, ?)";
 $query = $mysql->prepare($sql);
 $query->bind_param("ii", $user["userid"], $bottleid);
@@ -47,7 +62,7 @@ $query->execute();
 
 $response = [];
 $response["success"] = true;
-$response["message"] = "Bottle kept forever on your shelf!";
+$response["message"] = "Bottle pulled from the ocean and kept forever.";
 echo json_encode($response);
 
 ?>
