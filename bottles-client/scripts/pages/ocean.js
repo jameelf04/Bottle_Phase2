@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 
 let bottles = [];
 let bubbles = [];
+let renderedPositions = [];
 
 for (let i = 0; i < 40; i++) {
     bubbles.push({
@@ -86,11 +87,15 @@ function drawBubbles(dt) {
 }
 
 function drawBottles(time) {
+    renderedPositions = [];
+
     for (let i = 0; i < bottles.length; i++) {
         const b = bottles[i];
         const pixelX = (b.x / 100) * canvas.width;
         const bob = Math.sin(time / 700 + b.bottleid) * 4;
         const pixelY = (b.y / 100) * canvas.height + bob;
+
+        renderedPositions.push({ bottleid: b.bottleid, x: pixelX, y: pixelY });
 
         const glow = ctx.createRadialGradient(pixelX, pixelY, 0, pixelX, pixelY, 16);
         glow.addColorStop(0, "rgba(245, 169, 98, 0.55)");
@@ -126,3 +131,33 @@ function animate(time) {
 }
 
 requestAnimationFrame(animate);
+
+canvas.addEventListener("click", function(event){
+    const rect = canvas.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const clickY = event.clientY - rect.top;
+
+    let closest = null;
+    let closestDist = 12;
+
+    for (const pos of renderedPositions){
+        const dist = Math.sqrt(Math.pow(pos.x - clickX, 2) + Math.pow(pos.y - clickY, 2));
+        if (dist < closestDist){
+            closest = pos;
+            closestDist = dist;
+        }
+    }
+
+    const preview = document.getElementById("bottlePreview");
+
+    if (closest){
+        axios.get(BASE_URL + "bottle_preview.php", { params: { bottleid: closest.bottleid } })
+            .then(res => {
+                preview.textContent = res.data.message;
+                preview.style.display = "block";
+            })
+            .catch(err => console.log("Failed to load preview: " + err.message));
+    } else {
+        preview.style.display = "none";
+    }
+});
