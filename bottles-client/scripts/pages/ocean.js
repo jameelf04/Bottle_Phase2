@@ -15,10 +15,18 @@ for (let i = 0; i < 40; i++) {
     });
 }
 
+function handleOceanPositionsResult(res){
+    bottles = res.data.data;
+}
+
+function handleOceanPositionsError(err){
+    console.log("Failed to load ocean: " + err.message);
+}
+
 function fetchPositions() {
     axios.get(BASE_URL + "ocean_positions.php")
-        .then(res => { bottles = res.data.data; })
-        .catch(err => console.log("Failed to load ocean: " + err.message));
+        .then(handleOceanPositionsResult)
+        .catch(handleOceanPositionsError);
 }
 
 fetchPositions();
@@ -132,6 +140,16 @@ function animate(time) {
 
 requestAnimationFrame(animate);
 
+function handlePreviewResult(res){
+    const preview = document.getElementById("bottlePreview");
+    preview.textContent = res.data.message;
+    preview.style.display = "block";
+}
+
+function handlePreviewError(err){
+    console.log("Failed to load preview: " + err.message);
+}
+
 canvas.addEventListener("click", function(event){
     const rect = canvas.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
@@ -148,16 +166,11 @@ canvas.addEventListener("click", function(event){
         }
     }
 
-    const preview = document.getElementById("bottlePreview");
-
     if (closest){
         axios.get(BASE_URL + "bottle_preview.php", { params: { bottleid: closest.bottleid } })
-            .then(res => {
-                preview.textContent = res.data.message;
-                preview.style.display = "block";
-            })
-            .catch(err => console.log("Failed to load preview: " + err.message));
+            .then(handlePreviewResult)
+            .catch(handlePreviewError);
     } else {
-        preview.style.display = "none";
+        document.getElementById("bottlePreview").style.display = "none";
     }
 });
