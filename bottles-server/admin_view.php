@@ -1,7 +1,12 @@
 <?php
 include(__DIR__ . "/database/connection.php");
 
-$adminKey = "jameel123";
+$sql = "SELECT key_value FROM config WHERE key_name = 'admin_key'";
+$query = $mysql->prepare($sql);
+$query->execute();
+$array = $query->get_result();
+$row = $array->fetch_assoc();
+$adminKey = $row["key_value"];
 
 if (!isset($_POST["key"]) || $_POST["key"] !== $adminKey) {
     $response = [];
