@@ -1,17 +1,23 @@
 let adminKey = "";
 
+function handleAdminViewResult(res){
+    if(!res.data.success){
+        document.getElementById("reportedContainer").textContent = res.data.message;
+        return;
+    }
+    renderReported(res.data.data);
+}
+
+function handleAdminViewError(err){
+    document.getElementById("reportedContainer").textContent = "Failed to load reported bottles: " + err.message;
+}
+
 function submitKey(){
     adminKey = document.getElementById("adminKeyInput").value;
 
     axios.post(BASE_URL + "admin_view.php", new URLSearchParams({ key: adminKey }))
-        .then( res => {
-            if(!res.data.success){
-                alert(res.data.message);
-                return;
-            }
-            renderReported(res.data.data);
-        })
-        .catch( err => console.log("Failed to load reported bottles: " + err.message));
+        .then(handleAdminViewResult)
+        .catch(handleAdminViewError);
 }
 
 function renderReported(bottles){
@@ -28,11 +34,16 @@ function renderReported(bottles){
     }
 }
 
+function handleRemoveResult(res){
+    submitKey();
+}
+
+function handleRemoveError(err){
+    document.getElementById("reportedContainer").textContent = "Failed to remove bottle: " + err.message;
+}
+
 function removeBottle(bottleid){
     axios.post(BASE_URL + "admin_remove.php", new URLSearchParams({ key: adminKey, bottleid: bottleid }))
-        .then( res => {
-            console.log(res.data);
-            submitKey();
-        })
-        .catch( err => console.log("Failed to remove bottle: " + err.message));
+        .then(handleRemoveResult)
+        .catch(handleRemoveError);
 }
