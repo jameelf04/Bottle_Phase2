@@ -70,14 +70,14 @@ while ($b = $array->fetch_assoc()){
     }
 }
 
-$sql = "SELECT b.*, 
-        (SELECT COUNT(*) FROM draws d WHERE d.bottleid = b.bottleid) AS holdcount,
-        (SELECT COUNT(*) FROM marks m WHERE m.bottleid = b.bottleid) AS markcount,
-        TIMESTAMPDIFF(SECOND, b.time, NOW()) AS age_seconds
-        FROM bottles b
-        WHERE b.userid != ? 
-        AND b.status = 'active'
-        AND b.bottleid NOT IN (SELECT bottleid FROM draws WHERE userid = ?)";
+$sql = "SELECT bottles.*, 
+        (SELECT COUNT(*) FROM draws WHERE draws.bottleid = bottles.bottleid) AS holdcount,
+        (SELECT COUNT(*) FROM marks WHERE marks.bottleid = bottles.bottleid) AS markcount,
+        TIMESTAMPDIFF(SECOND, bottles.time, NOW()) AS age_seconds
+        FROM bottles
+        WHERE bottles.userid != ? 
+        AND bottles.status = 'active'
+        AND bottles.bottleid NOT IN (SELECT bottleid FROM draws WHERE userid = ?)";
 $query = $mysql->prepare($sql);
 $query->bind_param("ii", $user["userid"], $user["userid"]);
 $query->execute();
