@@ -22,6 +22,7 @@ $response["data"] = [];
 
 while ($bottle = $array->fetch_assoc()) {
     $bottleData = [];
+    $bottleData["bottleid"] = $bottle["bottleid"];
     $bottleData["message"] = $bottle["message"];
     $bottleData["age_seconds"] = $bottle["age_seconds"];
 
