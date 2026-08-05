@@ -19,9 +19,21 @@ function renderBottles(bottles){
             html += "<p>" + bottles[i].marks[j] + "</p>";
         }
 
+        html += "<button onclick=\"keepBottle(" + bottles[i].bottleid + ")\">Keep Forever</button>";
         html += "</div>";
         container.innerHTML += html;
     }
+}
+
+function keepBottle(bottleid){
+    const token = localStorage.getItem("token");
+
+    axios.post(BASE_URL + "keep.php", new URLSearchParams({ bottleid: bottleid, token: token }))
+        .then( res => {
+            alert(res.data.message);
+            location.reload();
+        })
+        .catch( err => console.log("Failed to keep: " + err.message));
 }
 
 function renderShelf(bottles){
