@@ -1,10 +1,26 @@
+function handleBottlesResult(res){
+    renderBottles(res.data.data);
+}
+
+function handleBottlesError(err){
+    document.getElementById("bottlesContainer").textContent = "Failed to load bottles: " + err.message;
+}
+
+function handleShelfResult(res){
+    renderShelf(res.data.data);
+}
+
+function handleShelfError(err){
+    document.getElementById("shelfContainer").textContent = "Failed to load shelf: " + err.message;
+}
+
 axios.get(BASE_URL + "mybottles.php", { params: { token: localStorage.getItem("token") } })
-    .then( res => renderBottles(res.data.data))
-    .catch( err => console.log("Failed to load bottles: " + err.message));
+    .then(handleBottlesResult)
+    .catch(handleBottlesError);
 
 axios.get(BASE_URL + "keeps.php", { params: { token: localStorage.getItem("token") } })
-    .then( res => renderShelf(res.data.data))
-    .catch( err => console.log("Failed to load shelf: " + err.message));
+    .then(handleShelfResult)
+    .catch(handleShelfError);
 
 function renderBottles(bottles){
     const container = document.getElementById("bottlesContainer");
@@ -25,15 +41,21 @@ function renderBottles(bottles){
     }
 }
 
+function handleKeepResult(res){
+    document.getElementById("shelfContainer").textContent = res.data.message;
+    location.reload();
+}
+
+function handleKeepError(err){
+    document.getElementById("bottlesContainer").textContent = "Failed to keep bottle: " + err.message;
+}
+
 function keepBottle(bottleid){
     const token = localStorage.getItem("token");
 
     axios.post(BASE_URL + "keep.php", new URLSearchParams({ bottleid: bottleid, token: token }))
-        .then( res => {
-            alert(res.data.message);
-            location.reload();
-        })
-        .catch( err => console.log("Failed to keep: " + err.message));
+        .then(handleKeepResult)
+        .catch(handleKeepError);
 }
 
 function renderShelf(bottles){
